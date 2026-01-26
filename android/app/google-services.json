@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "443529494796",
+    "project_id": "fitsol-app-trial-invoice-flow",
+    "storage_bucket": "fitsol-app-trial-invoice-flow.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:443529494796:android:d27a8e6738456210eb4929",
+        "android_client_info": {
+          "package_name": "com.example.invoice_flow_trial"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwi8--6heq82I6HtQzOPpOl6ZuVyjTp70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
