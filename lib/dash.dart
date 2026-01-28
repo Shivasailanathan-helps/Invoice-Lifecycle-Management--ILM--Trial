@@ -3,14 +3,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'database_service.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  
+  bool showOlderUpdates = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('DAILY LOG 📊'),
+        title: const Text('DAILY LOG '),
         centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -30,6 +38,7 @@ class DashboardScreen extends StatelessWidget {
           DateTime todayMidnight = DateTime(now.year, now.month, now.day);
 
           List<DocumentSnapshot> todaysUpdates = [];
+          List<DocumentSnapshot> olderUpdates = [];
 
           for (var doc in docs) {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
@@ -44,8 +53,10 @@ class DashboardScreen extends StatelessWidget {
               if (updatedTime.isAfter(todayMidnight)) {
                 todaysUpdates.add(doc);
                 completedToday++;
+              } else {
+                olderUpdates.add(doc);
               }
-            }
+            } 
           }
 
           return SingleChildScrollView(
@@ -97,12 +108,62 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     );
                   }).toList(),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Show older Logs", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey)),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                      onPressed: () {
+                        setState(() {
+                          showOlderUpdates = !showOlderUpdates;
+                        });
+                      },
+                    )
+                  ],
+                ),
+                const SizedBox(height: 10),
+
+                showOlderUpdates 
+                  ? olderUpdates.isEmpty
+                    ? Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                      child: const Text("No updates yet today.", textAlign: TextAlign.center),
+                    ) 
+                    : Column(children: _buildOlderUpdates(olderUpdates),)
+                  : const SizedBox.shrink(),
               ],
             ),
           );
         },
       ),
     );
+  }
+
+  List<Widget> _buildOlderUpdates(List<DocumentSnapshot> data) {
+    return data.map((doc) {
+      var data = doc.data() as Map<String, dynamic>;
+      DateTime time = (data['last_updated'] as Timestamp).toDate();
+      return Card(
+        color: Colors.white,
+        margin: const EdgeInsets.only(bottom: 10),
+        child: ListTile(
+          leading: const CircleAvatar(
+            backgroundColor: Color(0xFFE0F2F1),
+            child: Icon(Icons.history, color: Color(0xFF00A67E)),
+          ),
+          title: Text(data['project_name'] ?? 'Untitled', style: const TextStyle(fontWeight: FontWeight.bold)),
+          subtitle: Text(
+            "Updated at ${DateFormat('hh:mm a').format(time)}\nStatus: ${data['payment_status'] == 'Pending' ? 'Waiting Payment' : 'Paid'}",
+            style: const TextStyle(height: 1.5),
+          ),
+          trailing: const Icon(Icons.check_circle, color: Color(0xFF00A67E), size: 16),
+        ),
+      );
+    }).toList();
   }
 
   Widget _buildStatCard(String title, String count, Color color) {

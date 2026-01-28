@@ -57,7 +57,7 @@ class TableViewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MASTER SHEET 📑'),
+        title: const Text('MASTER SHEET '),
         centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
